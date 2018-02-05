@@ -1,9 +1,9 @@
 package org.usfirst.frc.team2869.robot;
 
-
-
 import edu.wpi.first.wpilibj.buttons.Button;
+import edu.wpi.first.wpilibj.buttons.JoystickButton;
 
+import org.usfirst.frc.team2869.robot.commands.ExampleCommand;
 
 /**
  * This class is the glue that binds the controls on the physical operator
@@ -11,7 +11,8 @@ import edu.wpi.first.wpilibj.buttons.Button;
  */
 public class OI {
 	public static Xbox360 driverJoystick = new Xbox360(0);
-	
+	JoystickButton bButton = driverJoystick.GetBButton();
+	//bButton.whileHeld(new LiftEleva tor());
 	//public static Xbox360 operatorJoystick = new Xbox360(1);
 	//// CREATING BUTTONS
 	// One type of button is a joystick button which is any button on a

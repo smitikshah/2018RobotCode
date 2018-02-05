@@ -1,5 +1,6 @@
+
 package org.usfirst.frc.team2869.robot;
-import edu.wpi.first.wpilibj.AnalogInput;
+
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -9,17 +10,9 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import java.io.IOException;
-
-import org.usfirst.frc.team2869.robot.commands.ActivateCylinder;
 import org.usfirst.frc.team2869.robot.commands.BaselineAutonomous;
 import org.usfirst.frc.team2869.robot.commands.DoNothingAuto;
-import org.usfirst.frc.team2869.robot.commands.Drive;
 import org.usfirst.frc.team2869.robot.commands.DriveForward;
-import org.usfirst.frc.team2869.robot.commands.LiftCube;
-import org.usfirst.frc.team2869.robot.commands.TimedDrive;
-import org.usfirst.frc.team2869.robot.subsystems.CubeLift;
-import org.usfirst.frc.team2869.robot.subsystems.Cylinder;
 //import org.usfirst.frc.team2869.robot.commands.LeftCornerAutonomous;
 //import org.usfirst.frc.team2869.robot.commands.MiddleAutonomous;
 //import org.usfirst.frc.team2869.robot.commands.MoveClimber;
@@ -31,10 +24,7 @@ import org.usfirst.frc.team2869.robot.subsystems.Cylinder;
 //import org.usfirst.frc.team2869.robot.commands.SpinRoller;
 //import org.usfirst.frc.team2869.robot.commands.SpinShooter;
 import org.usfirst.frc.team2869.robot.subsystems.DriveTrain;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.SampleRobot;
-import edu.wpi.first.wpilibj.Timer;
+
 //import com.ctre.CANTalon.TalonControlMode;
 
 /**
@@ -45,14 +35,11 @@ import edu.wpi.first.wpilibj.Timer;
  * directory.
  */
 public class Robot extends IterativeRobot {
-	DigitalInput lightSwitch;
+
 	public static OI oi;
 	public static DriveTrain driveTrain;
 	public static double moveValue, rotateValue;
-	public static final Cylinder cylinder = new Cylinder();
-	public static DoubleSolenoid armCylinder = new DoubleSolenoid(6,7);
-	boolean ArmState;
-	boolean armStateTest;
+	
 	Command autonomousCommand;
 	SendableChooser<Command> chooser = new SendableChooser<>();
 	
@@ -68,8 +55,6 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putNumber("Degrees", 0);
 		oi = new OI();
 		driveTrain = new DriveTrain();
-		lightSwitch = new DigitalInput(1);
-		//driveTrain.drive.setSafetyEnabled(false);
 	//	compressorSwitch = new Comp ressorSwitch();
 //		OI.driverJoystick.GetBButton().whenActive(new SpinLift());
 //		OI.driverJoystick.GetRightBumper().whenActive(new SpinRoller());
@@ -137,23 +122,17 @@ public class Robot extends IterativeRobot {
 	 * chooser code above (like the commented example) or additional comparisons
 	 * to the switch structure below with additional strings & commands.
 	 */
-
+	@Override
 	public void autonomousInit() {
-		//autonomousCommand = new DriveForward(.8,10);
-		
 		String gameData;
 		gameData = DriverStation.getInstance().getGameSpecificMessage();
 		if(gameData.charAt(0) == 'L')
 		{
-			autonomousCommand = new Drive(5);
-			
+			autonomousCommand = new BaselineAutonomous();
 			
 		} else {
 			autonomousCommand = new DoNothingAuto();
-		}
-		 //Drive set in milliseconds
-		//autonomousCommand = new TimedDrive(5); //TimedDrive set in seconds
-		
+			}
 		
 		
 
@@ -174,9 +153,16 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		Scheduler.getInstance().run();
-		
-		
+		autonomousCommand = new BaselineAutonomous();
+//		String gameData;
+//		gameData = DriverStation.getInstance().getGameSpecificMessage();
+//		if(gameData.charAt(0) == 'L')
+//		{
+//			new DriveForward(-.8,-10);
+//		} else {
+//			new DriveForward(-.8,-10);
+//		}
+//		Scheduler.getInstance().run();
 	}
 
 	@Override
@@ -184,7 +170,7 @@ public class Robot extends IterativeRobot {
 		// This makes sure that the autonomous stops running when
 		// teleop starts running. If you want the autonomous to
 		// continue until interrupted by another command, remove
-		boolean armStateTest = false;
+		
 		if (autonomousCommand != null)
 			autonomousCommand.cancel();
 	}
@@ -196,40 +182,20 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
-		
 		//driveTrain.drive.arcadeDrive(OI.driverJoystick.GetAllTriggers(), OI.driverJoystick.GetLeftX());
 		//System.out.println(OI.driverJoystick.getPort());
 		//shooter.pid.setPID(SmartDashboard.getDouble("P"), SmartDashboard.getDouble("I"),
 			//	SmartDashboard.getDouble("D"));
 		SmartDashboard.putNumber("Yaw", driveTrain.gyro.getYaw());
-		//System.out.println(lightSwitch.get());
-		//this is a co
-		
-		if(OI.driverJoystick.GetAButton().get()||lightSwitch.get()){
-			ArmState = true;
-			armCylinder.set(DoubleSolenoid.Value.kForward);
-		} else {
-			ArmState = false;
-
-			armCylinder.set(DoubleSolenoid.Value.kReverse);    	
-		}
-		
-		if(ArmState != armStateTest){
-			if(armStateTest = true) {
-				System.out.println("Arm Up");
-				armStateTest = false;
-			}
-		} else {
-			
-		}
 		
 		
+		//This might change the speed of the motors.
+		driveTrain.drive.arcadeDrive(OI.driverJoystick.GetAllTriggers(), -OI.driverJoystick.GetLeftX());
 		
-		driveTrain.drive.arcadeDrive(OI.driverJoystick.GetAllTriggers(),-OI.driverJoystick.GetLeftX());
+		
 	}
 
-
-	/*
+	/**
 	 * This function is called periodically during test mode
 	 */
 	@Override
